@@ -1,0 +1,65 @@
+name: Build python app
+
+on:
+    push:
+        branches:
+            - dev
+            - feature-1
+    pull_request:
+        branches:
+            - main
+
+env:
+    NAME : ${{secrets.NAME}}   
+    LOCATION : us-central-1
+    REPO_NAME: python-app
+    IMAGE_NAME: ${{secrets.IMAGE}}         
+
+jobs:
+    ci:
+        name: Test & Security Scan
+        runs-on: ubuntu-latest
+        outputs:
+            tag: ${{steps.set-env.outputs.image_tag}}
+
+        
+        steps:
+            - name: checkout code
+              uses: actions/checkout@v4
+            
+            - name: Set up Python
+              uses: actions/setup-python@v4
+              with:
+                python-version: '3.10'            
+
+            - name: Install dependencies
+              run: |
+                  pip install -r requirements.txt
+                  pip install pytest bandit
+
+            - name: Run tests
+              run: pytest test_app.py
+
+            - name: Run security scan
+              run: bandit -r .
+            
+            - name: Get image tag from SHA
+              id: set-env
+              run: |
+                echo "image_tag=1.0.0-${GITHUB_RUN_NUMBER}-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+              
+
+    build:
+        name: Test & Security Scan
+        runs-on: ubuntu-latest
+        needs: ci
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Build Docker image
+              run: |
+                docker build -t ${{ env.LOCATION }}-docker.pkg.dev/${{ env.IMAGE_NAME }}:${{ needs.ci.outputs.tag }} .
+
+            - name: docker image
+              run: docker images -a
