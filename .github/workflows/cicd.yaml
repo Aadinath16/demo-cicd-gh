@@ -1,6 +1,16 @@
 name: Build python app
 
 on:
+    workflow_dispatch:
+        inputs:
+            environment:
+                description: 'Select environment'
+                required: true
+                default: 'dev'
+                type: choice
+                options:
+                    - dev
+                    - feature-1
     push:
         branches:
             - dev
@@ -19,6 +29,7 @@ jobs:
     ci:
         name: Test & Security Scan
         runs-on: ubuntu-latest
+        if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/stage'
         outputs:
             tag: ${{steps.set-env.outputs.image_tag}}
 
@@ -52,6 +63,7 @@ jobs:
     build:
         name: Test & Security Scan
         runs-on: ubuntu-latest
+        if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/stage'
         needs: ci
         steps:
             - name: Checkout code
