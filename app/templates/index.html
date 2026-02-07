@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flask Error Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            text-align: center;
+        }
+        button {
+            padding: 12px 20px;
+            margin: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .success { background-color: #4CAF50; color: white; }
+        .warning { background-color: #FF9800; color: white; }
+        .error   { background-color: #F44336; color: white; }
+    </style>
+</head>
+<body>
+    <h1>Flask Error Generator</h1>
+    <p>Click a button to trigger logs & responses:</p>
+    <button class="success" onclick="trigger('/success')">Trigger 200 (OK)</button>
+    <button class="warning" onclick="trigger('/error/400')">Trigger 400 (Bad Request)</button>
+    <button class="error" onclick="trigger('/error/500')">Trigger 500 (Server Error)</button>
+
+    <pre id="responseBox"></pre>
+
+    <script>
+        async function trigger(endpoint) {
+            try {
+                const res = await fetch(endpoint);
+                const data = await res.json();
+                document.getElementById("responseBox").innerText = JSON.stringify(data, null, 2);
+            } catch (err) {
+                document.getElementById("responseBox").innerText = "Error: " + err;
+            }
+        }
+    </script>
+</body>
+</html>
