@@ -2,15 +2,15 @@ name: Build python app
 
 on:
     workflow_dispatch:
-        inputs:
-            environment:
-                description: 'Select environment'
-                required: true
-                default: 'dev'
-                type: choice
-                options:
-                    - dev
-                    - feature-1
+        # inputs:
+        #     environment:
+        #         description: 'Select environment'
+        #         required: true
+        #         default: 'dev'
+        #         type: choice
+        #         options:
+        #             - dev
+        #             - feature-1
     push:
         branches:
             - dev
@@ -20,7 +20,7 @@ on:
             - main
 
 env:
-    NAME : ${{secrets.NAME}}   
+    # NAME : ${{secrets.NAME}}   
     LOCATION : us-central-1
     REPO_NAME: python-app
     IMAGE_NAME: ${{secrets.IMAGE}}         
