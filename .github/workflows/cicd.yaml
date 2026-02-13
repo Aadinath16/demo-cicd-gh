@@ -1,0 +1,93 @@
+name: Build python app
+
+on:
+    workflow_dispatch:
+        # inputs:
+        #     environment:
+        #         description: 'Select environment'
+        #         required: true
+        #         default: 'dev'
+        #         type: choice
+        #         options:
+        #             - dev
+        #             - feature-1
+    push:
+        branches:
+            - dev
+            - feature-1
+    pull_request:
+        branches:
+            - main
+
+env:
+    # NAME : ${{secrets.NAME}}   
+    LOCATION : us-central-1
+    REPO_NAME: python-app
+    IMAGE_NAME: ${{secrets.IMAGE}}         
+
+jobs:
+    ci:
+        name: Test & Security Scan
+        runs-on: ubuntu-latest
+        if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/stage'
+        outputs:
+            tag: ${{steps.set-env.outputs.image_tag}}
+
+        
+        steps:
+            - name: checkout code
+              uses: actions/checkout@v4
+            
+            - name: Set up Python
+              uses: actions/setup-python@v4
+              with:
+                python-version: '3.10'            
+
+            # - name: Install dependencies
+            #   run: |
+            #       pip install -r app/requirements.txt
+            #       pip install bandit
+
+            # - name: Run security scan
+            #   run: bandit -r .
+            
+            - name: Get image tag from SHA
+              id: set-env
+              run: |
+                echo "image_tag=1.0.0-${GITHUB_RUN_NUMBER}-${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+            - name: Get external IP
+              run: |
+                curl -s ifconfig.me > ip.txt
+                ls -la ip.txt
+
+            - name: Upload IP file
+              uses: actions/upload-artifact@v4
+              with:
+                name: external-ip
+                path: ip.txt
+
+    build:
+        name: Test & Security Scan
+        runs-on: ubuntu-latest
+        if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/stage'
+        needs: ci
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v3
+
+            - name: Download IP file
+              uses: actions/download-artifact@v4
+              with:
+                name: external-ip
+                path: .
+
+            - name: Show IP
+              run: cat ip.txt
+
+            - name: Build Docker image
+              run: |
+                docker build -t ${{ env.LOCATION }}-docker.pkg.dev/${{ env.IMAGE_NAME }}:${{ needs.ci.outputs.tag }} .
+
+            - name: docker image
+              run: docker images -a
