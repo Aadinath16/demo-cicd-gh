@@ -34,15 +34,15 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           workload_identity_provider: 'projects/428421184142/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
-          service_account: 'github-runner-sa@${{ secrets.PROJECT_ID }}.iam.gserviceaccount.com'
-          project_id: ${{ secrets.PROJECT_ID }}
+          service_account: 'github-runner-sa@gcp-test-1618-dev.iam.gserviceaccount.com'
+          project_id: gcp-test-1618-dev
 
       - name: Get GKE Credentials
         uses: 'google-github-actions/get-gke-credentials@v2'
         with:
           cluster_name: 'gke-dev'
           location: 'us-central1-a'
-          project_id: ${{ secrets.PROJECT_ID }}
+          project_id: gcp-test-1618-dev
 
       - name: Check/Install NGINX
         run: |
