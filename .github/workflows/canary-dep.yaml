@@ -18,7 +18,7 @@ on:
 #             - main
 
 env:
-    PROJECT_ID: ${{ secrets.PROJECT_ID }}
+    GCLOUD_PROJECT: ${{ secrets.PROJECT_ID }}
 
 
 jobs:
@@ -80,15 +80,15 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           workload_identity_provider: 'projects/428421184142/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
-          service_account: 'github-runner-sa@${{ env.PROJECT_ID }}.iam.gserviceaccount.com'
-          project_id: ${{ env.PROJECT_ID }}
+          service_account: 'github-runner-sa@${{ env.GCLOUD_PROJECT }}.iam.gserviceaccount.com'
+          project_id: ${{ env.GCLOUD_PROJECT }}
 
       - name: Get GKE Credentials
         uses: 'google-github-actions/get-gke-credentials@v2'
         with:
           cluster_name: 'gke-dev'
           location: 'us-central1-a'
-          project_id: ${{ env.PROJECT_ID }}
+          project_id: ${{ env.GCLOUD_PROJECT }}
           use_internal_ip: true
 
       - name: Promote V2 to 100%
