@@ -43,6 +43,7 @@ jobs:
           cluster_name: 'gke-dev'
           location: 'us-central1-a'
           project_id: gcp-test-1618-dev
+          use_internal_ip: true
 
       - name: Check/Install NGINX
         run: |
@@ -84,6 +85,7 @@ jobs:
           cluster_name: 'gke-dev'
           location: 'us-central1-a'
           project_id: ${{ secrets.PROJECT_ID }}
+          use_internal_ip: true
 
       - name: Promote V2 to 100%
         run: |
