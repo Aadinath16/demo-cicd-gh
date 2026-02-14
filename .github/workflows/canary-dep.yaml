@@ -1,8 +1,21 @@
 name: Production Canary Deployment
 
 on:
-  push:
-    branches: [ main ]
+    push:
+        branches:
+            - dev
+            - feature-1
+    pull_request:
+        branches:
+            - main
+
+#     push:
+#         branches:
+#             - dev
+#             - feature-1
+#     pull_request:
+#         branches:
+#             - main
 
 jobs:
   deploy-canary:
