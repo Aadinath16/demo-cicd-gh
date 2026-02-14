@@ -35,12 +35,14 @@ jobs:
         with:
           workload_identity_provider: 'projects/428421184142/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
           service_account: 'github-runner-sa@${{ secrets.PROJECT_ID }}.iam.gserviceaccount.com'
+          project_id: ${{ secrets.PROJECT_ID }}
 
       - name: Get GKE Credentials
         uses: 'google-github-actions/get-gke-credentials@v2'
         with:
           cluster_name: 'gke-dev'
           location: 'us-central1-a'
+          project_id: ${{ secrets.PROJECT_ID }}
 
       - name: Check/Install NGINX
         run: |
@@ -74,12 +76,14 @@ jobs:
         with:
           workload_identity_provider: 'projects/428421184142/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
           service_account: 'github-runner-sa@${{ secrets.PROJECT_ID }}.iam.gserviceaccount.com'
+          project_id: ${{ secrets.PROJECT_ID }}
 
       - name: Get GKE Credentials
         uses: 'google-github-actions/get-gke-credentials@v2'
         with:
           cluster_name: 'gke-dev'
           location: 'us-central1-a'
+          project_id: ${{ secrets.PROJECT_ID }}
 
       - name: Promote V2 to 100%
         run: |
