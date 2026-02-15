@@ -66,43 +66,43 @@ jobs:
           kubectl apply -f k8s/app-v2.yaml
           kubectl apply -f k8s/nginx-canary-ingress.yaml
 
-  promote-to-prod:
-    name: "Phase 2: 100% Rollout"
-    needs: deploy-canary
-    runs-on: self-hosted
-    environment: production-live # Manual Gate 2
-    permissions:
-      contents: read
-      id-token: write
+  # promote-to-prod:
+  #   name: "Phase 2: 100% Rollout"
+  #   needs: deploy-canary
+  #   runs-on: self-hosted
+  #   environment: 'production-approval' # Manual Gate 2
+  #   permissions:
+  #     contents: read
+  #     id-token: write
 
-    steps:
-      - name: Set up gcloud
-        uses: google-github-actions/setup-gcloud@v2
-        with:
-          project_id: ${{ env.GCLOUD_PROJECT }}
+  #   steps:
+  #     - name: Set up gcloud
+  #       uses: google-github-actions/setup-gcloud@v2
+  #       with:
+  #         project_id: ${{ env.GCLOUD_PROJECT }}
 
-      - name: Authenticate to GCP
-        uses: 'google-github-actions/auth@v2'
-        with:
-          workload_identity_provider: 'projects/428421184142/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
-          service_account: 'github-runner-sa@${{ env.GCLOUD_PROJECT }}.iam.gserviceaccount.com'
-          # project_id: ${{ env.GCLOUD_PROJECT }}
+  #     - name: Authenticate to GCP
+  #       uses: 'google-github-actions/auth@v2'
+  #       with:
+  #         workload_identity_provider: 'projects/428421184142/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+  #         service_account: 'github-runner-sa@${{ env.GCLOUD_PROJECT }}.iam.gserviceaccount.com'
+  #         # project_id: ${{ env.GCLOUD_PROJECT }}
 
-      - name: Get GKE Credentials
-        uses: 'google-github-actions/get-gke-credentials@v2'
-        with:
-          cluster_name: 'gke-dev'
-          location: 'us-central1-a'
-          # project_id: ${{ env.GCLOUD_PROJECT }}
-          use_internal_ip: true
+  #     - name: Get GKE Credentials
+  #       uses: 'google-github-actions/get-gke-credentials@v2'
+  #       with:
+  #         cluster_name: 'gke-dev'
+  #         location: 'us-central1-a'
+  #         # project_id: ${{ env.GCLOUD_PROJECT }}
+  #         use_internal_ip: true
 
-      - name: Promote V2 to 100%
-        run: |
-          # 1. Update Main Ingress to point to V2 service
-          kubectl apply -f k8s/nginx-main-ingress-v2.yaml
+  #     - name: Promote V2 to 100%
+  #       run: |
+  #         # 1. Update Main Ingress to point to V2 service
+  #         kubectl apply -f k8s/nginx-main-ingress-v2.yaml
           
-          # 2. Cleanup Canary Rule
-          kubectl delete -f k8s/nginx-canary-ingress.yaml
+  #         # 2. Cleanup Canary Rule
+  #         kubectl delete -f k8s/nginx-canary-ingress.yaml
 
   promote-production:
     needs: deploy-canary
