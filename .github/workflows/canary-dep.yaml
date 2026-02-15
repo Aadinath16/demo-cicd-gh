@@ -38,7 +38,7 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           workload_identity_provider: 'projects/428421184142/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
-          service_account: 'github-runner-sa@g${{ env.GCLOUD_PROJECT }}.iam.gserviceaccount.com'
+          service_account: 'github-runner-sa@${{ env.GCLOUD_PROJECT }}.iam.gserviceaccount.com'
           project_id: ${{ env.GCLOUD_PROJECT }}
 
       - name: Get GKE Credentials
