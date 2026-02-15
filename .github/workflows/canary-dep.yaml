@@ -120,10 +120,12 @@ jobs:
           kubectl apply -f k8s/nginx-main-ingress.yaml
 
           # 2. Remove the 10% Canary rule (no longer needed)
-          kubectl delete ingress nginx-canary --ignore-not-found=true
+          kubectl delete ingress hello-ingress-canary --ignore-not-found=true
 
+          # Delete SVC
+          kubectl delete svc hello-v1-svc --ignore-not-found=true
           # 3. Clean up V1 deployment
-          kubectl delete deployment app-v1 --ignore-not-found=true
+          kubectl delete deployment hello-v1 --ignore-not-found=true
 
 
 # name: Production Canary Deployment
