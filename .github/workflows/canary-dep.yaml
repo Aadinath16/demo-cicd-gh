@@ -38,15 +38,15 @@ jobs:
         uses: 'google-github-actions/auth@v2'
         with:
           workload_identity_provider: 'projects/428421184142/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
-          service_account: 'github-runner-sa@gcp-test-1618-dev.iam.gserviceaccount.com'
-          project_id: gcp-test-1618-dev
+          service_account: 'github-runner-sa@g${{ env.GCLOUD_PROJECT }}.iam.gserviceaccount.com'
+          project_id: ${{ env.GCLOUD_PROJECT }}
 
       - name: Get GKE Credentials
         uses: 'google-github-actions/get-gke-credentials@v2'
         with:
           cluster_name: 'gke-dev'
           location: 'us-central1-a'
-          project_id: gcp-test-1618-dev
+          project_id: ${{ env.GCLOUD_PROJECT }}
           use_internal_ip: true
 
       - name: Check/Install NGINX
@@ -103,6 +103,27 @@ jobs:
           
           # 2. Cleanup Canary Rule
           kubectl delete -f k8s/nginx-canary-ingress.yaml
+
+  promote-production:
+    needs: deploy-canary
+    runs-on: self-hosted
+    # This creates a "Wait" button in GitHub Actions UI
+    environment: 'production-approval' 
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Promote V2 to 100% Traffic
+        run: |
+          # 1. Update the Main Ingress to point to V2 Service
+          # We use sed to swap the service name in the manifest
+          sed -i 's/app-v1-service/app-v2-service/g' k8s/nginx-main-ingress.yaml
+          kubectl apply -f k8s/nginx-main-ingress.yaml
+
+          # 2. Remove the 10% Canary rule (no longer needed)
+          kubectl delete ingress nginx-canary --ignore-not-found=true
+
+          # 3. Clean up V1 deployment
+          kubectl delete deployment app-v1 --ignore-not-found=true
 
 
 # name: Production Canary Deployment
